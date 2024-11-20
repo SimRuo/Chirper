@@ -1,7 +1,27 @@
 ﻿@page "/"
+@using Chirper.Models;
+
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-6">
+            <h1 class="d-flex justify-content-center">Hello, world!</h1>
+            <ChirpList />
+            <button @onclick="() => Console.WriteLine(123)">Cunt</button>
 
-Welcome to your new app.
+        </div>
+        <div class="col"></div>
+    </div>
+</div>
+
+@code {
+    @* Skriver lite kommentarer här bara
+    anledningen till att skiten inte funkar just nu är för att jag skapat pisskiten i vs code och jag har inget rendermode afaik just nu
+    läs den här länken och forstätt sen när du pallar:
+    https://github.com/dotnet/aspnetcore/issues/54423
+    https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0
+     *@
+}

@@ -10,4 +10,7 @@ obj/Debug/net8.0/Chirper.AssemblyInfo.cs
 obj/Debug/net8.0/Chirper.AssemblyInfoInputs.cache
 obj/Debug/net8.0/Chirper.assets.cache
 obj/Debug/net8.0/Chirper.GeneratedMSBuildEditorConfig.editorconfig
-obj/Debug/net8.0
+obj/Debug/net8.0/*
+obj/Debug/net8.0/
+bin/*
+bin/

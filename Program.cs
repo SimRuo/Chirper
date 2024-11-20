@@ -1,10 +1,20 @@
 using Chirper.Components;
+using Chirper.Data;
+using Chirper.Services;
+using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddScoped<ChirpService>();
+builder.Services.AddControllers(); // Add MVC controllers
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite("Data Source=chirps.db"));
+    
+
 
 var app = builder.Build();
 
@@ -19,9 +29,13 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.UseRouting();
+app.UseAntiforgery(); //Has to go after UseRouting()
+
+app.MapControllers(); // Enable API controllers
 
 app.Run();
