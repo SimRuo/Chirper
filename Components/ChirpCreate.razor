@@ -1,0 +1,26 @@
+@using Chirper.Services
+@using Chirper.Models
+@inject ChirpService ChirpService
+
+<h3>Chirps</h3>
+
+<h3>Add Chirp</h3>
+<input @bind="newChirpContent" placeholder="What's happening?" />
+<button @onclick="() => AddChirp()">Chirp</button>
+
+@code {
+    [Parameter] public EventCallback<Chirp> OnChirpAdded { get; set; }
+    private string newChirpContent;
+
+
+    private async Task AddChirp()
+    {
+        if (!string.IsNullOrWhiteSpace(newChirpContent))
+        {
+            var chirp = new Chirp { Content = newChirpContent, Author = "User123" };
+            await ChirpService.AddChirpAsync(chirp);
+            newChirpContent = string.Empty;
+            await OnChirpAdded.InvokeAsync(chirp); // Notify the parent
+        }
+    }
+}

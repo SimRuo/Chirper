@@ -2,39 +2,24 @@
 @using Chirper.Models
 @inject ChirpService ChirpService
 
-<h3>Chirps</h3>
 
-<ul>
-    @foreach (var chirp in chirps)
+<div class="row">
+    @foreach (var chirp in Chirps)
     {
-        <li>@chirp.Author: @chirp.Content (@chirp.CreatedAt)</li>
+        <div class="col-12 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">@chirp.Author</h6>
+                    <p class="card-text">@chirp.Content</p>
+                    <small class="text-muted">@chirp.CreatedAt.ToString("g")</small>
+                </div>
+            </div>
+        </div>
     }
-</ul>
-
-<h3>Add Chirp</h3>
-<input @bind="newChirpContent" placeholder="What's happening?" />
-<button @onclick="() => AddChirp()">Chirp</button>
+</div>
 
 @code {
-    private List<Chirp> chirps = new();
-    private string newChirpContent;
+    [Parameter] public List<Chirp> Chirps { get; set; } = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        chirps = await ChirpService.GetChirpsAsync();
-        Console.WriteLine("Component initialized");
 
-    }
-
-    private async Task AddChirp()
-    {
-        if (!string.IsNullOrWhiteSpace(newChirpContent))
-        {
-            Console.WriteLine("Pissknapp");
-            var chirp = new Chirp { Content = newChirpContent, Author = "User123" };
-            await ChirpService.AddChirpAsync(chirp);
-            newChirpContent = string.Empty;
-            chirps = await ChirpService.GetChirpsAsync(); // Refresh the list
-        }
-    }
 }
