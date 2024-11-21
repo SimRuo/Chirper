@@ -1,5 +1,10 @@
 ﻿@page "/"
 @using Chirper.Models;
+@using Chirper.Services
+@inject ChirpService ChirpService
+@rendermode InteractiveServer
+
+
 
 
 <PageTitle>Home</PageTitle>
@@ -8,20 +13,33 @@
     <div class="row">
         <div class="col"></div>
         <div class="col-6">
-            <h1 class="d-flex justify-content-center">Hello, world!</h1>
-            <ChirpList />
-            <button @onclick="() => Console.WriteLine(123)">Cunt</button>
-
+            <h1 class="d-flex justify-content-center">Posts</h1>
+            <ChirpList Chirps="chirps" />
+            <ChirpCreate OnChirpAdded="HandleChirpAdded" />
         </div>
         <div class="col"></div>
     </div>
 </div>
 
 @code {
-    @* Skriver lite kommentarer här bara
-    anledningen till att skiten inte funkar just nu är för att jag skapat pisskiten i vs code och jag har inget rendermode afaik just nu
-    läs den här länken och forstätt sen när du pallar:
-    https://github.com/dotnet/aspnetcore/issues/54423
-    https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0
-     *@
+    private List<Chirp> chirps = new();
+
+    private bool isInitialized;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !isInitialized)
+        {
+            chirps = await ChirpService.GetChirpsAsync();
+            isInitialized = true;
+            StateHasChanged(); // Trigger UI update
+            Console.WriteLine("Chirps loaded on first render");
+        }
+    }
+
+    private void HandleChirpAdded(Chirp chirp)
+    {
+        chirps.Add(chirp); // Update the shared list
+        StateHasChanged(); // Force the UI to re-render
+    }
 }
