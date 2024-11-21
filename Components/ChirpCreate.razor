@@ -2,15 +2,29 @@
 @using Chirper.Models
 @inject ChirpService ChirpService
 
-<h3>Chirps</h3>
+<div class="card p-3 shadow-sm mb-4 mt-4">
 
-<h3>Add Chirp</h3>
-<input @bind="newChirpContent" placeholder="What's happening?" />
-<button @onclick="() => AddChirp()">Chirp</button>
+    <div class="form-group">
+        <textarea class="form-control border-0 rounded" style="resize: none; font-size: 1.2rem;" rows="3"
+            maxlength="280" placeholder="What's happening?" @bind="newChirpContent">
+        </textarea>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-2">
+        <small class="text-muted">@($"{280 - (newChirpContent?.Length ?? 0)} characters left")</small>
+        <button class="btn btn-primary rounded-pill px-4 py-2" @onclick="AddChirp"
+            disabled="@(string.IsNullOrWhiteSpace(newChirpContent))">
+            Chirp
+        </button>
+    </div>
+
+</div>
+
+
+
 
 @code {
     [Parameter] public EventCallback<Chirp> OnChirpAdded { get; set; }
-    private string newChirpContent;
+    private string? newChirpContent;
 
 
     private async Task AddChirp()
