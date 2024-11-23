@@ -24,7 +24,6 @@
     private List<Chirp> chirps = new();
 
     private bool isInitialized;
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender && !isInitialized)

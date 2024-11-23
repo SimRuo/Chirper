@@ -25,13 +25,14 @@
 @code {
     [Parameter] public EventCallback<Chirp> OnChirpAdded { get; set; }
     private string? newChirpContent;
+    private User exampleUser = new User(1, "ExampleMan", "exampleman@mail.se", "Password");
 
 
     private async Task AddChirp()
     {
         if (!string.IsNullOrWhiteSpace(newChirpContent))
         {
-            var chirp = new Chirp { Content = newChirpContent, Author = "User123" };
+            var chirp = new Chirp { Content = newChirpContent, Author = exampleUser };
             await ChirpService.AddChirpAsync(chirp);
             newChirpContent = string.Empty;
             await OnChirpAdded.InvokeAsync(chirp); // Notify the parent
