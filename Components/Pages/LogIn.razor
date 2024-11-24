@@ -1,0 +1,44 @@
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore;
+@rendermode InteractiveServer
+
+@page "/login"
+
+
+<div class="container">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-6 border">
+            @if (showLoginForm)
+            {
+                <LogInForm OnLoginSuccess="HandleLoginSuccess" OnChangeForm="HandleChangeForm" />
+            }
+            else
+            {
+                <CreateAccountForm OnAccountCreated="HandleAccountCreated" />
+            }
+
+
+        </div>
+        <div class="col"></div>
+    </div>
+</div>
+@code {
+
+    private bool showLoginForm = true;
+    private async Task HandleChangeForm()
+    {
+        showLoginForm = false;
+    }
+    private async Task HandleLoginSuccess()
+    {
+        // Redirect to the next page after successful login
+        NavigationManager.NavigateTo("/");
+    }
+
+    private async Task HandleAccountCreated()
+    {
+        // Handle post-account creation logic (e.g., show a success message)
+        Console.WriteLine("Account successfully created!");
+    }
+}

@@ -1,0 +1,52 @@
+@using System.ComponentModel.DataAnnotations;
+
+
+<h4>Log In</h4>
+
+<EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="alert alert-danger" />
+
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="loginModel.Email" placeholder="Enter your email" />
+        <ValidationMessage For="@(() => loginModel.Email)" class="text-danger" />
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <InputText id="password" class="form-control" @bind-Value="loginModel.Password" type="password"
+            placeholder="Enter your password" />
+        <ValidationMessage For="@(() => loginModel.Password)" class="text-danger" />
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <button type="submit" class="btn btn-primary">Log In</button>
+    </div>
+</EditForm>
+
+<div class="d-flex justify-content-center mt-4">
+    <button class="btn btn-secondary" @onclick="OnChangeForm">Create a new account</button>
+</div>
+
+@code {
+    private LoginModel loginModel = new();
+
+    private async Task HandleLogin()
+    {
+        // Logic to authenticate the user
+        Console.WriteLine($"Logging in with email: {loginModel.Email}");
+        await OnLoginSuccess.InvokeAsync();
+    }
+
+    [Parameter] public EventCallback OnLoginSuccess { get; set; }
+    [Parameter] public EventCallback OnChangeForm { get; set; }
+
+    public class LoginModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; }
+        [Required]
+        public string Password { get; set; }
+    }
+}

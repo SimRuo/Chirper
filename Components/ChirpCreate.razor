@@ -1,6 +1,10 @@
 @using Chirper.Services
 @using Chirper.Models
+@using Chirper.Data
+@using Microsoft.EntityFrameworkCore;
 @inject ChirpService ChirpService
+@inject AppDbContext DbContext
+
 
 <div class="card p-3 shadow-sm mb-4 mt-4">
 
@@ -25,9 +29,17 @@
 @code {
     [Parameter] public EventCallback<Chirp> OnChirpAdded { get; set; }
     private string? newChirpContent;
-    private User exampleUser = new User(1, "ExampleMan", "exampleman@mail.se", "Password");
+    private User? exampleUser;
+    private bool isInitialized;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !isInitialized)
+        {
+            exampleUser = await DbContext.Users.OrderBy(u => u.Id).FirstOrDefaultAsync();
 
-
+            Console.WriteLine("User loaded on first render");
+        }
+    }
     private async Task AddChirp()
     {
         if (!string.IsNullOrWhiteSpace(newChirpContent))

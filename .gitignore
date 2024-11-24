@@ -15,4 +15,3 @@ obj/Debug/net8.0/
 bin/*
 bin/
 Migrations/
-Migrations/AppDbContextModelSnapshot.cs
