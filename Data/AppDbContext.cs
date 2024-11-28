@@ -24,6 +24,11 @@ namespace Chirper.Data
                 .HasOne(c => c.Author) // A Chirp has one Author
                 .WithMany(u => u.Chirps) // A User has many Chirps
                 .HasForeignKey(c => c.UserId); // UserId is the foreign key
+
+            // Adding a unique constraint to the Username column in the User entity
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Username) // Create an index on the Username property
+                .IsUnique(); // Ensure the index is unique
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
