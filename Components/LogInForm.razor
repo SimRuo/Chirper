@@ -1,4 +1,8 @@
 @using System.ComponentModel.DataAnnotations;
+@using Microsoft.EntityFrameworkCore
+@using Chirper.Data
+@inject Chirper.Data.AppDbContext DbContext
+
 
 
 <h4>Log In</h4>
@@ -18,6 +22,11 @@
         <InputText id="password" class="form-control" @bind-Value="loginModel.Password" type="password"
             placeholder="Enter your password" />
         <ValidationMessage For="@(() => loginModel.Password)" class="text-danger" />
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="text-danger mt-1">@errorMessage</div>
+        }
     </div>
 
     <div class="d-flex justify-content-center mt-4">
@@ -31,14 +40,40 @@
 
 @code {
     private LoginModel loginModel = new();
-
+    private string errorMessage = "";
     private async Task HandleLogin()
     {
-        // Logic to authenticate the user
-        Console.WriteLine($"Logging in with email: {loginModel.Email}");
+        // Retrieve the user by email
+        var user = await DbContext.Users
+        .FirstOrDefaultAsync(u => u.Email == loginModel.Email);
+
+        if (user == null)
+        {
+            // User not found
+            Console.WriteLine("User not found.");
+            errorMessage = "Invalid email or password.";
+            return;
+        }
+
+        // Compare passwords (use a proper password hashing library in a real app)
+        if (!VerifyPassword(loginModel.Password, user.PasswordHash))
+        {
+            // Incorrect password
+            Console.WriteLine("Invalid password.");
+            errorMessage = "Invalid email or password.";
+            return;
+        }
+
+        // Login successful
+        Console.WriteLine("Login successful.");
         await OnLoginSuccess.InvokeAsync();
     }
-
+    // Placeholder for password verification (replace with actual hashing logic)
+    private bool VerifyPassword(string enteredPassword, string storedPasswordHash)
+    {
+        // In real apps, use libraries like BCrypt or PBKDF2 for secure hashing
+        return enteredPassword == storedPasswordHash;
+    }
     [Parameter] public EventCallback OnLoginSuccess { get; set; }
     [Parameter] public EventCallback OnChangeForm { get; set; }
 

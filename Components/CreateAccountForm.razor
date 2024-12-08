@@ -53,6 +53,7 @@
             if (usernameExists)
             {
                 errorMessage = "Username already taken.";
+                StateHasChanged();
                 return;
             }
 
