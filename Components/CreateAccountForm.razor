@@ -40,6 +40,7 @@
 @code {
     private AccountModel accountModel = new();
     private string? errorMessage;
+    // This should maybe be moved to a service?
     private async Task HandleAccountCreation()
     {
         errorMessage = string.Empty;
