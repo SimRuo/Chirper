@@ -1,6 +1,5 @@
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore;
-@rendermode InteractiveServer
 
 @page "/login"
 
@@ -8,37 +7,21 @@
 <div class="container">
     <div class="row">
         <div class="col"></div>
-        <div class="col-6 border">
-            @if (showLoginForm)
-            {
-                <LogInForm OnLoginSuccess="HandleLoginSuccess" OnChangeForm="HandleChangeForm" />
-            }
-            else
-            {
-                <CreateAccountForm OnAccountCreated="HandleAccountCreated" />
-            }
-
-
+        <div class="col-6 border shadow-sm border-top-0">
+            <LogInForm OnLoginSuccess="HandleLoginSuccess" />
+            <div class="d-flex justify-content-center mt-4 mb-3">
+                <a class="btn btn-secondary" href="/register">Create a new account</a>
+            </div>
         </div>
         <div class="col"></div>
     </div>
 </div>
 @code {
 
-    private bool showLoginForm = true;
-    private async Task HandleChangeForm()
-    {
-        showLoginForm = false;
-    }
     private async Task HandleLoginSuccess()
     {
         // Redirect to the next page after successful login
         NavigationManager.NavigateTo("/");
     }
 
-    private async Task HandleAccountCreated()
-    {
-        // Handle post-account creation logic (e.g., show a success message)
-        Console.WriteLine("Account successfully created!");
-    }
 }

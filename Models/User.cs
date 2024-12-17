@@ -2,24 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace Chirper.Models
 {
-    public class User
+    public class User : IdentityUser
     {
-        public int Id { get; set; } //Primary Key
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string PasswordHash { get; set; }
         public ICollection<Chirp> Chirps { get; set; }
 
         public User() { }
-        public User(int Id, string Username, string Email, string PasswordHash)
+        public User(string username, string email)
         {
-            this.Id = Id;
-            this.Username = Username;
-            this.Email = Email;
-            this.PasswordHash = PasswordHash;
+            UserName = username;
+            Email = email;
         }
     }
 }

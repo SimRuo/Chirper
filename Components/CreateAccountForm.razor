@@ -2,11 +2,15 @@
 @using Chirper.Data
 @using Chirper.Models
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
 @inject AppDbContext DbContext
 
 
+<h4 class="pt-3">Create Account</h4>
+<p class="text-danger">@errorMessage</p>
 
-<EditForm Model="@accountModel" OnValidSubmit="@HandleAccountCreation">
+<EditForm Model="accountModel" OnValidSubmit="HandleAccountCreation" FormName="register">
     <DataAnnotationsValidator />
     <ValidationSummary class="alert alert-danger" />
 
@@ -15,7 +19,6 @@
         <InputText placeholder="Enter your username" id="username" class="form-control"
             @bind-Value="accountModel.Username" />
         <ValidationMessage For="@(() => accountModel.Username)" class="text-danger" />
-        <p class="text-danger">@errorMessage</p>
 
     </div>
 
@@ -38,19 +41,20 @@
 </EditForm>
 
 @code {
-    private AccountModel accountModel = new();
+    [SupplyParameterFromForm] //Without this the form wont work
+    private AccountModel accountModel { get; set; } = new();
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+    [Parameter] public EventCallback OnAccountCreated { get; set; }
     private string? errorMessage;
-    // This should maybe be moved to a service?
-    private async Task HandleAccountCreation()
+    private async Task HandleAccountCreation() // This should maybe be moved to a service?
     {
         errorMessage = string.Empty;
 
         try
         {
-            // Check if the username exists
-            var usernameExists = await DbContext.Users
-            .AnyAsync(u => u.Username == accountModel.Username);
-
+            // Check if the username or email already exists
+            var usernameExists = await UserManager.FindByNameAsync(accountModel.Username) != null;
             if (usernameExists)
             {
                 errorMessage = "Username already taken.";
@@ -58,16 +62,34 @@
                 return;
             }
 
-            // Add new user
+            var emailExists = await UserManager.FindByEmailAsync(accountModel.Email) != null;
+            if (emailExists)
+            {
+                errorMessage = "Email already in use.";
+                StateHasChanged();
+                return;
+            }
+
+            // Create new user
             var user = new User
                 {
-                    Username = accountModel.Username,
-                    Email = accountModel.Email,
-                    PasswordHash = accountModel.Password // Add password hashing
+                    UserName = accountModel.Username,
+                    Email = accountModel.Email
                 };
 
-            DbContext.Users.Add(user);
-            await DbContext.SaveChangesAsync();
+            // Attempt to create the user with the password
+            var result = await UserManager.CreateAsync(user, accountModel.Password);
+
+            if (result.Succeeded)
+            {
+                await OnAccountCreated.InvokeAsync(null); //callback to parent page
+            }
+            else
+            {
+                // Collect and show errors
+                errorMessage = string.Join(" ", result.Errors.Select(e => e.Description));
+                StateHasChanged();
+            }
         }
         catch (Exception ex)
         {
@@ -76,9 +98,7 @@
         }
     }
 
-    [Parameter] public EventCallback OnAccountCreated { get; set; }
-
-    public class AccountModel
+    public class AccountModel //This should probably be moved somewhere else
     {
         [Required]
         public string Username { get; set; }

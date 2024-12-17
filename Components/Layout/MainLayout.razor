@@ -1,15 +1,36 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Chirper.Models
+@inject AuthenticationStateProvider AuthStateProvider
+@inject SignInManager<User> SignInManager
+
 
 <div class="page">
     <main>
         <div class="top-row d-flex align-items-center px-4">
             <img src="Logo2 nobg.png" class="img-fluid h-100" alt="">
-            <p class="mb-0 ms-3 fw-bold">Chirper</p>
-            <NavLink href="/LogIn" class="btn btn-outline-primary rounded-pill px-4 py-2 ms-auto fw-bold"
-                activeClass="btn-primary">
-                Log In
-            </NavLink>
+            <a href="/" class="mb-0 ms-3 fw-bold text-decoration-none text-dark">Chirper</a>
+            <CascadingAuthenticationState>
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/Logout" class="btn btn-primary rounded-pill px-4 py-2 fw-bold ms-auto">Logout</a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <NavLink href="/LogIn" class="btn btn-outline-primary rounded-pill px-4 py-2 ms-auto fw-bold"
+                            activeClass="btn-primary">
+                            Log In
+                        </NavLink>
+                        <NavLink href="/Register" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold ms-1"
+                            activeClass="btn-primary">
+                            Register
+                        </NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </CascadingAuthenticationState>
+
         </div>
+
 
         <article class="content px-4">
             @Body
@@ -22,3 +43,23 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+@code {
+    private string UserName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            UserName = user.Identity.Name ?? "User";
+        }
+    }
+    private async Task Logout()
+    {
+        await SignInManager.SignOutAsync();
+        Console.WriteLine("Does this even do anything");
+    }
+}

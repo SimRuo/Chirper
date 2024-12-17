@@ -1,6 +1,8 @@
 using Chirper.Components;
 using Chirper.Data;
 using Chirper.Services;
+using Chirper.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -13,8 +15,11 @@ builder.Services.AddScoped<ChirpService>();
 builder.Services.AddControllers(); // Add MVC controllers
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=chirps.db"));
-    
 
+// Configure Identity with AppDbContext and default options
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
@@ -34,6 +39,10 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.UseRouting();
+
+app.UseAuthentication(); // Enable Authentication Middleware
+app.UseAuthorization(); // Enable Authorization Middleware
+
 app.UseAntiforgery(); //Has to go after UseRouting()
 
 app.MapControllers(); // Enable API controllers

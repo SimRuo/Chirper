@@ -10,7 +10,7 @@ namespace Chirper.Models
         public int Id { get; set; } // Primary key
         public required string Content { get; set; } // Tweet text
         public required User Author { get; set; } // Username or user ID
-        public int UserId { get; set; } // Only the foreign key
+        public string UserId { get; set; } // Only the foreign key
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Default to current time
         public int Likes { get; set; } = 0; // Default likes to zero
 
