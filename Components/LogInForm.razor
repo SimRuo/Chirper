@@ -59,9 +59,8 @@
 
             if (result.Succeeded)
             {
-                // Successfully logged in
                 Console.WriteLine("Login successful.");
-                // NavigationManager.NavigateTo("/"); This doesnt work for some reason just commenting out for the time being
+                await Task.Run(() => { NavigationManager.NavigateTo("/"); });
             }
             else
             {
@@ -76,9 +75,6 @@
             Console.WriteLine(ex.Message);
         }
     }
-    [Parameter] public EventCallback OnLoginSuccess { get; set; }
-    [Parameter] public EventCallback OnChangeForm { get; set; }
-
     public class LoginModel
     {
         [Required]

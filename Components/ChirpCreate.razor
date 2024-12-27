@@ -6,7 +6,7 @@
 @using System.Security.Claims;
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ChirpService ChirpService
-@inject AppDbContext DbContext
+@inject UserService UserService
 
 
 <div class="card p-3 shadow-sm mb-4 mt-4">
@@ -32,18 +32,6 @@
 @code {
     [Parameter] public EventCallback<Chirp> OnChirpAdded { get; set; }
     private string? newChirpContent;
-    private User? exampleUser;
-    private bool isInitialized;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && !isInitialized)
-        {
-            exampleUser = await DbContext.Users.OrderBy(u => u.Id).FirstOrDefaultAsync();
-
-            Console.WriteLine("User loaded on first render");
-        }
-    }
     private async Task AddChirp()
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -55,14 +43,14 @@
         if (!string.IsNullOrWhiteSpace(userId) && !string.IsNullOrWhiteSpace(newChirpContent))
         {
             // Query the database to get the user
-            var loggedInUserId = await DbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var loggedInUser = await UserService.GetUserByIdAsync(userId);
 
-            if (loggedInUserId != null)
+            if (loggedInUser != null)
             {
                 var chirp = new Chirp
                     {
                         Content = newChirpContent,
-                        Author = loggedInUserId // Associate the chirp with the logged-in user
+                        Author = loggedInUser // Associate the chirp with the logged-in user
                     };
 
                 await ChirpService.AddChirpAsync(chirp); // Save chirp through your service

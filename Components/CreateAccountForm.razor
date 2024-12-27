@@ -1,10 +1,10 @@
 @using System.ComponentModel.DataAnnotations
 @using Chirper.Data
 @using Chirper.Models
+@using Chirper.Services
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Identity
-@inject UserManager<User> UserManager
-@inject AppDbContext DbContext
+@inject UserService UserService
 
 
 <h4 class="pt-3">Create Account</h4>
@@ -43,52 +43,39 @@
 @code {
     [SupplyParameterFromForm] //Without this the form wont work
     private AccountModel accountModel { get; set; } = new();
-    [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = default!;
     [Parameter] public EventCallback OnAccountCreated { get; set; }
     private string? errorMessage;
-    private async Task HandleAccountCreation() // This should maybe be moved to a service?
+
+    private async Task HandleAccountCreation()
     {
         errorMessage = string.Empty;
 
         try
         {
-            // Check if the username or email already exists
-            var usernameExists = await UserManager.FindByNameAsync(accountModel.Username) != null;
-            if (usernameExists)
+            // Check if username is taken
+            if (await UserService.IsUsernameTakenAsync(accountModel.Username))
             {
                 errorMessage = "Username already taken.";
-                StateHasChanged();
                 return;
             }
 
-            var emailExists = await UserManager.FindByEmailAsync(accountModel.Email) != null;
-            if (emailExists)
+            // Check if email is taken
+            if (await UserService.IsEmailTakenAsync(accountModel.Email))
             {
                 errorMessage = "Email already in use.";
-                StateHasChanged();
                 return;
             }
 
-            // Create new user
-            var user = new User
-                {
-                    UserName = accountModel.Username,
-                    Email = accountModel.Email
-                };
-
-            // Attempt to create the user with the password
-            var result = await UserManager.CreateAsync(user, accountModel.Password);
+            // Attempt to create user
+            var result = await UserService.CreateUserAsync(accountModel.Username, accountModel.Email, accountModel.Password);
 
             if (result.Succeeded)
             {
-                await OnAccountCreated.InvokeAsync(null); //callback to parent page
+                await OnAccountCreated.InvokeAsync(null);
             }
             else
             {
-                // Collect and show errors
                 errorMessage = string.Join(" ", result.Errors.Select(e => e.Description));
-                StateHasChanged();
             }
         }
         catch (Exception ex)
@@ -98,7 +85,7 @@
         }
     }
 
-    public class AccountModel //This should probably be moved somewhere else
+    public class AccountModel
     {
         [Required]
         public string Username { get; set; }

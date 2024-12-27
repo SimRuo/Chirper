@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddScoped<ChirpService>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddControllers(); // Add MVC controllers
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=chirps.db"));

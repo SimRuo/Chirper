@@ -3,6 +3,8 @@
 @inject ChirpService ChirpService
 
 
+@* use gutters instead of padding and margin etc *@
+
 <div class="row">
     @foreach (var chirp in Chirps.OrderByDescending(c => c.CreatedAt))
     {
