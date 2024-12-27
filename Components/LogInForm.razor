@@ -1,0 +1,85 @@
+@using System.ComponentModel.DataAnnotations;
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Authentication
+@using Chirper.Data
+@using Chirper.Models
+@inject Chirper.Data.AppDbContext DbContext
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@inject NavigationManager NavigationManager
+
+
+
+<h4 class="pt-3">Log In</h4>
+
+<EditForm Model="loginModel" OnValidSubmit="HandleLogin" FormName="login">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="alert alert-danger" />
+
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="loginModel.Email" placeholder="Enter your email" />
+        <ValidationMessage For="@(() => loginModel.Email)" class="text-danger" />
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <InputText id="password" class="form-control" @bind-Value="loginModel.Password" type="password"
+            placeholder="Enter your password" />
+        <ValidationMessage For="@(() => loginModel.Password)" class="text-danger" />
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="text-danger mt-1">@errorMessage</div>
+        }
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <button type="submit" class="btn btn-primary">Log In</button>
+    </div>
+</EditForm>
+
+
+@code {
+    private string errorMessage = "";
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private LoginModel loginModel { get; set; } = new();
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var result = await SignInManager.PasswordSignInAsync(loginModel.Email, loginModel.Password, false, false);
+
+            if (result.Succeeded)
+            {
+                Console.WriteLine("Login successful.");
+                await Task.Run(() => { NavigationManager.NavigateTo("/"); });
+            }
+            else
+            {
+                // Invalid login
+                Console.WriteLine("Login failed.");
+                errorMessage = "Invalid email or password.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An error occurred while logging in. Please try again.";
+            Console.WriteLine(ex.Message);
+        }
+    }
+    public class LoginModel
+    {
+        [Required]
+        public string Email { get; set; }
+        [Required]
+        public string Password { get; set; }
+    }
+}

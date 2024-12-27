@@ -1,6 +1,13 @@
 @using Chirper.Services
 @using Chirper.Models
+@using Chirper.Data
+@using Microsoft.EntityFrameworkCore;
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims;
+@inject AuthenticationStateProvider AuthStateProvider
 @inject ChirpService ChirpService
+@inject UserService UserService
+
 
 <div class="card p-3 shadow-sm mb-4 mt-4">
 
@@ -25,16 +32,40 @@
 @code {
     [Parameter] public EventCallback<Chirp> OnChirpAdded { get; set; }
     private string? newChirpContent;
-
-
     private async Task AddChirp()
     {
-        if (!string.IsNullOrWhiteSpace(newChirpContent))
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userClaims = authState.User;
+
+        // Retrieve user ID from claims
+        var userId = userClaims.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (!string.IsNullOrWhiteSpace(userId) && !string.IsNullOrWhiteSpace(newChirpContent))
         {
-            var chirp = new Chirp { Content = newChirpContent, Author = "User123" };
-            await ChirpService.AddChirpAsync(chirp);
-            newChirpContent = string.Empty;
-            await OnChirpAdded.InvokeAsync(chirp); // Notify the parent
+            // Query the database to get the user
+            var loggedInUser = await UserService.GetUserByIdAsync(userId);
+
+            if (loggedInUser != null)
+            {
+                var chirp = new Chirp
+                    {
+                        Content = newChirpContent,
+                        Author = loggedInUser // Associate the chirp with the logged-in user
+                    };
+
+                await ChirpService.AddChirpAsync(chirp); // Save chirp through your service
+                newChirpContent = string.Empty; // Clear input
+                await OnChirpAdded.InvokeAsync(chirp); // Notify the parent
+            }
+            else
+            {
+                Console.WriteLine("User not found in the database.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("User ID or Chirp content is invalid.");
         }
     }
+
 }

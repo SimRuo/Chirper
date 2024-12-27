@@ -1,0 +1,97 @@
+@using System.ComponentModel.DataAnnotations
+@using Chirper.Data
+@using Chirper.Models
+@using Chirper.Services
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Identity
+@inject UserService UserService
+
+
+<h4 class="pt-3">Create Account</h4>
+<p class="text-danger">@errorMessage</p>
+
+<EditForm Model="accountModel" OnValidSubmit="HandleAccountCreation" FormName="register">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="alert alert-danger" />
+
+    <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <InputText placeholder="Enter your username" id="username" class="form-control"
+            @bind-Value="accountModel.Username" />
+        <ValidationMessage For="@(() => accountModel.Username)" class="text-danger" />
+
+    </div>
+
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <InputText placeholder="Enter your email" id="email" class="form-control" @bind-Value="accountModel.Email" />
+        <ValidationMessage For="@(() => accountModel.Email)" class="text-danger" />
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <InputText id="password" placeholder="Enter your password" class="form-control"
+            @bind-Value="accountModel.Password" type="password" />
+        <ValidationMessage For="@(() => accountModel.Password)" class="text-danger" />
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <button type="submit" class="btn btn-primary">Create Account</button>
+    </div>
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm] //Without this the form wont work
+    private AccountModel accountModel { get; set; } = new();
+    [Parameter] public EventCallback OnAccountCreated { get; set; }
+    private string? errorMessage;
+
+    private async Task HandleAccountCreation()
+    {
+        errorMessage = string.Empty;
+
+        try
+        {
+            // Check if username is taken
+            if (await UserService.IsUsernameTakenAsync(accountModel.Username))
+            {
+                errorMessage = "Username already taken.";
+                return;
+            }
+
+            // Check if email is taken
+            if (await UserService.IsEmailTakenAsync(accountModel.Email))
+            {
+                errorMessage = "Email already in use.";
+                return;
+            }
+
+            // Attempt to create user
+            var result = await UserService.CreateUserAsync(accountModel.Username, accountModel.Email, accountModel.Password);
+
+            if (result.Succeeded)
+            {
+                await OnAccountCreated.InvokeAsync(null);
+            }
+            else
+            {
+                errorMessage = string.Join(" ", result.Errors.Select(e => e.Description));
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An unexpected error occurred. Please try again.";
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public class AccountModel
+    {
+        [Required]
+        public string Username { get; set; }
+        [Required, EmailAddress]
+        public string Email { get; set; }
+        [Required]
+        public string Password { get; set; }
+    }
+}

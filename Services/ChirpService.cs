@@ -20,7 +20,9 @@ namespace Chirper.Services
 
         public async Task<List<Chirp>> GetChirpsAsync()
         {
-            return await _context.Chirps.ToListAsync();
+            return await _context.Chirps
+                .Include(c => c.Author) // Include the Author (User) when fetching Chirps
+                .ToListAsync();
         }
 
         public async Task AddChirpAsync(Chirp chirp)

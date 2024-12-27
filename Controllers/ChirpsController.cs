@@ -9,6 +9,7 @@ using Chirper.Models;
 
 namespace Chirper.Controllers
 {
+    /* nothing here is actually used, will need to implement proper API calls later, right now the services just use the entity framework to interact with the database directly */
     [Route("api/[controller]")]
     [ApiController]
     public class ChirpsController : ControllerBase

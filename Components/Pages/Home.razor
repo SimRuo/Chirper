@@ -11,7 +11,9 @@
 
 <div class="container">
     <div class="row">
-        <div class="col"></div>
+        <div class="col">
+            <Sidebar></Sidebar>
+        </div>
         <div class="col-6 border-top-0 border">
             <ChirpCreate OnChirpAdded="HandleChirpAdded" />
             <ChirpList Chirps="chirps" />
@@ -24,8 +26,7 @@
     private List<Chirp> chirps = new();
 
     private bool isInitialized;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender) //this is so that there's only one SQL fetch made
     {
         if (firstRender && !isInitialized)
         {
@@ -42,3 +43,41 @@
         StateHasChanged(); // Force the UI to re-render
     }
 }
+
+
+@* There's really no need for this code right now other than showcasing it can be done, the queries are so fast it won't ever show 
+
+@attribute [StreamRendering]
+@if (!isInitialized)
+{
+    <!-- Placeholder cards while loading -->
+    @for (int i = 0; i < 3; i++)
+    {
+        <div class="card my-3">
+            <div class="card-body">
+                <h5 class="placeholder-glow">
+                    <span class="placeholder col-6"></span>
+                </h5>
+                <p class="placeholder-glow">
+                    <span class="placeholder col-7"></span>
+                    <span class="placeholder col-4"></span>
+                    <span class="placeholder col-6"></span>
+                    <span class="placeholder col-8"></span>
+                </p>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <!-- Render the Chirps -->
+    <ChirpList Chirps="chirps" />
+
+
+
+        protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering, maybe ill remove later
+        await Task.Delay(0);
+    }
+} *@
