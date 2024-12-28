@@ -1,0 +1,20 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var currentPath = new Uri(NavigationManager.Uri).AbsolutePath;
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Exclude /login and /register from redirection
+        if (user.Identity?.IsAuthenticated == false && currentPath != "/login" && currentPath != "/Register")
+        {
+            NavigationManager.NavigateTo("/login", true);
+        }
+    }
+}
