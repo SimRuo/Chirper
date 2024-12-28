@@ -12,7 +12,7 @@
         var user = authState.User;
 
         // Exclude /login and /register from redirection
-        if (user.Identity?.IsAuthenticated == false && currentPath != "/login" && currentPath != "/Register")
+        if (user.Identity?.IsAuthenticated == false && currentPath != "/login" && currentPath != "/register")
         {
             NavigationManager.NavigateTo("/login", true);
         }
