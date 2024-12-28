@@ -10,7 +10,6 @@
     protected override async Task OnInitializedAsync()
     {
         await SignInManager.SignOutAsync();
-        Navigation.NavigateTo("/", true); //this only reloads the component from which it is called.
-        Navigation.Refresh(true);
+        Navigation.NavigateTo("/", true); //will actually be redirected to /login because of RedirectToLogin.razor
     }
 }

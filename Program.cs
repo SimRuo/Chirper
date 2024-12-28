@@ -16,6 +16,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddControllers(); // Add MVC controllers
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=chirps.db"));
+builder.Services.AddHttpContextAccessor();
 
 // Configure Identity with AppDbContext and default options
 builder.Services.AddIdentity<User, IdentityRole>()

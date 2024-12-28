@@ -5,7 +5,7 @@
 @using Microsoft.AspNetCore.Identity
 
 
-@page "/Register"
+@page "/register"
 
 
 <div class="container">
@@ -14,7 +14,9 @@
         <div class="col-6 border shadow-sm border-top-0">
             <CreateAccountForm />
             <div class="d-flex justify-content-center mt-4 mb-3">
-                <a class="btn btn-secondary" href="/LogIn">Log in</a>
+                <NavLink href="/login" class="btn btn-secondary" activeClass="btn-primary">
+                    Log In
+                </NavLink>
             </div>
         </div>
         <div class="col"></div>

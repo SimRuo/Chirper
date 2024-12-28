@@ -10,16 +10,11 @@
         <div class="col-6 border shadow-sm border-top-0">
             <LogInForm />
             <div class="d-flex justify-content-center mt-4 mb-3">
-                <button class="btn btn-secondary" @onclick="gotoregister">Create a new account</button>
+                <NavLink href="/register" class="btn btn-secondary" activeClass="btn-primary">
+                    Register
+                </NavLink>
             </div>
         </div>
         <div class="col"></div>
     </div>
 </div>
-
-@code {
-    private void gotoregister()
-    {
-        NavigationManager.NavigateTo("/");
-    }
-}
